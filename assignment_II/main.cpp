@@ -21,7 +21,7 @@ int main() {
 
     if( x + b == 0) {
         cout << "División entre cero no permitida, reinicie e ingrese los valores para (x) y (b) nuevamente" << endl;
-        return 1; // Si la expresión es false, se muestra el error y se retorna 1 para evitar que el código continúe ejecutándose.
+        return 1; // Si la expresión es true, se muestra el error y se retorna 1 para evitar que el código continúe ejecutándose.
     }
     
     y = a / (x + b);
