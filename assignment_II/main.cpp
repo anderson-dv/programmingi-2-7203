@@ -29,6 +29,10 @@ int main() {
     cout << "El resultado de la proporcionalidad inversa es:" << endl;
     cout << "y = " << a << " / (" << x << " + " << b << ")" << endl;
     cout << "y = " << y << endl;
+
+    cout << "Presiona Enter para salir...";
+    cin.ignore(); 
+    cin.get();  // Permite al usuario ver el resultado antes de cerrar la consola
     
     return 0;
 }
