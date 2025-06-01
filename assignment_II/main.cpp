@@ -5,7 +5,6 @@ using namespace std;
 // float flotante = 9.5;
 // double doble = 12353.6543;
 
-
 // return 1; Se retorna 1 cuando el programa termina por una condición no válida o por un error 
 
 int main() {
@@ -36,3 +35,4 @@ int main() {
     
     return 0;
 }
+
