@@ -1,14 +1,14 @@
-#include <iostream> 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <cmath>
+#include <algorithm>
 using namespace std;
 
 struct fecha {
-    int dia;
-    int mes;
-    int anio;
+    int dia, mes, anio;
     
     // Constructor por defecto
     fecha() : dia(0), mes(0), anio(0) {}
@@ -38,20 +38,20 @@ class Empleado {
         // Destructor virtual para manejo adecuado de polimorfismo
         virtual ~Empleado() = default;
 
-        virtual void mostrarDatos() const { // Método virtual para mostrar los datos del empleado
+        virtual void mostrarDatos() const { // Metodo virtual para mostrar los datos del empleado
             cout << "Tipo: " << tipo << endl;
             cout << "Nombre: " << nombre << endl;
             cout << "ID: " << id << endl;
             cout << "Anios en la industria: " << anios_industria << endl;
         }
 
-        // Métodos virtuales para guardar y cargar datos
+        // Metodos virtuales para guardar y cargar datos
         virtual string toFileString() const {
             return "E," + nombre + "," + to_string(id) + "," + to_string(anios_industria);
         }
 
         virtual void fromFileString(const string& data) {
-            // Este método se implementa en las clases derivadas
+            // Este metodo se implementa en las clases derivadas
         }
 };
 
@@ -86,7 +86,104 @@ class Director : public Empleado {
         }
 };
 
+class Equipo {
+protected:
+    int numInv;
+    float costo;
+public:
+    Equipo(int ni, float c) : numInv(ni), costo(c) {}
+    virtual ~Equipo() = default;
+    virtual float calcularConsumo() const = 0;
+    virtual string getTipo() const = 0;
+    int getNumInv() const { return numInv; }
+    float getCosto() const { return costo; }
+};
+
+
+class Bomba : public Equipo {
+protected:
+    float ps, pd, f;
+public:
+    Bomba(int ni, float c, float ps, float pd, float f)
+        : Equipo(ni, c), ps(ps), pd(pd), f(f) {}
+
+    float getPs() const { return ps; }
+    float getPd() const { return pd; }
+    float getF() const { return f; }
+};
+
+
+class Centrifuga : public Bomba {
+    float der;
+    int np;
+public:
+    Centrifuga(int ni, float c, float ps, float pd, float f, float der, int np) 
+        : Bomba(ni, c, ps, pd, f), der(der), np(np) {}
+
+    float calcularConsumo() const override {
+        return 0.38 * (ps + pd) + 2.3 * f + 3.4 * (der + np);
+    }
+
+    string getTipo() const override {
+        return "Centrifuga";
+    }
+
+    float getDer() const { return der; }
+    int getNp() const { return np; }
+
+    float getPs() const { return ps; }
+    float getPd() const { return pd; }
+    float getF() const { return f; }
+};
+
+
+class Embolo : public Bomba {
+    float l, d;
+public:
+    Embolo(int ni, float c, float ps, float pd, float f, float l, float d) 
+        : Bomba(ni, c, ps, pd, f), l(l), d(d) {}
+
+    float calcularConsumo() const override {
+        return 0.38 * (ps + pd) + 2.3 * f;
+    }
+
+    string getTipo() const override {
+        return "Embolo";
+    }
+
+    float getL() const { return l; }
+    float getD() const { return d; }
+
+    float getPs() const { return ps; }
+    float getPd() const { return pd; }
+    float getF() const { return f; }
+};
+
+
+class Intercambiador : public Equipo {
+    float a, ptc, d;
+public:
+    Intercambiador(int ni, float c, float a, float ptc, float d) 
+        : Equipo(ni, c), a(a), ptc(ptc), d(d) {}
+
+    float calcularConsumo() const override {
+        return 0.25 * ptc + log(d);
+    }
+
+    string getTipo() const override {
+        return "Intercambiador";
+    }
+
+    float getA() const { return a; }
+    float getPtc() const { return ptc; }
+    float getD() const { return d; }
+};
+
+
 vector<Empleado*> empleados; // Vector global para almacenar empleados
+
+vector<Equipo*> equipos;
+float consumoAlumbrado = 0; 
 
 // Función para guardar datos en archivo
 void guardarDatos() {
@@ -174,7 +271,7 @@ void aniadirEmpleado() {
 
         empleados.push_back(nuevoEmpleado);
     }
-    guardarDatos(); // Guardar automáticamente
+    guardarDatos(); // Guardar automaticamente
 }
 
 void aniadirDirector() {
@@ -212,7 +309,7 @@ void aniadirDirector() {
 
         empleados.push_back(nuevoDirector);
     }
-    guardarDatos(); // Guardar automáticamente
+    guardarDatos(); // Guardar automaticamente
 }
 
 void mostrarEmpleados() {
@@ -263,11 +360,192 @@ void eliminarEmpleado() {
     cout << "No se encontro empleado con ID: " << id << endl;
 }
 
+void aniadirEquipo() {
+    int tipo;
+    cout << "Seleccione tipo de equipo (1=Centrifuga, 2=Embolo, 3=Intercambiador): ";
+    cin >> tipo;
+
+    if (tipo == 1) {
+        int ni, np;
+        float c, ps, pd, f, der;
+        cout << "Ingrese numero de inventario: "; cin >> ni;
+        cout << "Ingrese costo: "; cin >> c;
+        cout << "Ingrese presion de succion: "; cin >> ps;
+        cout << "Ingrese presion de descarga: "; cin >> pd;
+        cout << "Ingrese flujo: "; cin >> f;
+        cout << "Ingrese diametro del eje de rotacion: "; cin >> der;
+        cout << "Ingrese numero de paletas: "; cin >> np;
+
+        equipos.push_back(new Centrifuga(ni, c, ps, pd, f, der, np));
+        cout << "Centrifuga anadida correctamente." << endl;
+    } 
+    else if (tipo == 2) {
+        int ni;
+        float c, ps, pd, f, l, d;
+        cout << "Ingrese numero de inventario: "; cin >> ni;
+        cout << "Ingrese costo: "; cin >> c;
+        cout << "Ingrese presion de succion: "; cin >> ps;
+        cout << "Ingrese presion de descarga: "; cin >> pd;
+        cout << "Ingrese flujo: "; cin >> f;
+        cout << "Ingrese largo: "; cin >> l;
+        cout << "Ingrese diametro: "; cin >> d;
+
+        equipos.push_back(new Embolo(ni, c, ps, pd, f, l, d));
+        cout << "embolo anadido correctamente." << endl;
+    } 
+    else if (tipo == 3) {
+        int ni;
+        float c, a, ptc, d;
+        cout << "Ingrese numero de inventario: "; cin >> ni;
+        cout << "Ingrese costo: "; cin >> c;
+        cout << "Ingrese area: "; cin >> a;
+        cout << "Ingrese presion del tubo central: "; cin >> ptc;
+        cout << "Ingrese diametro: "; cin >> d;
+
+        equipos.push_back(new Intercambiador(ni, c, a, ptc, d));
+        cout << "Intercambiador anadido correctamente." << endl;
+    } 
+    else {
+        cout << "Tipo de equipo no valido." << endl;
+    }
+}
+
+
+float calcularConsumoTotal() {
+    float total = consumoAlumbrado;
+    for (auto eq : equipos) {
+        total += eq->calcularConsumo();
+    }
+    return total;
+}
+
+void equipoMayorConsumo() {
+    if (equipos.empty()) {
+        cout << "No hay equipos registrados." << endl;
+        return;
+    }
+    auto mayor = max_element(equipos.begin(), equipos.end(),
+        [](Equipo* a, Equipo* b) { return a->calcularConsumo() < b->calcularConsumo(); });
+    cout << "Equipo de mayor consumo: #" << (*mayor)->getNumInv()
+         << " (" << (*mayor)->getTipo() << ") Consumo: "
+         << (*mayor)->calcularConsumo() << endl;
+}
+
+void listarCentrifugasOrdenadas() {
+    vector<Centrifuga*> centrifugas;
+    for (auto eq : equipos) {
+        if (auto c = dynamic_cast<Centrifuga*>(eq)) {
+            centrifugas.push_back(c);
+        }
+    }
+    sort(centrifugas.begin(), centrifugas.end(),
+         [](Centrifuga* a, Centrifuga* b) { return a->getDer() > b->getDer(); });
+
+    cout << "Centrifugas ordenadas por diametro descendente:\n";
+    for (auto c : centrifugas) {
+        cout << "NumInv: " << c->getNumInv() << ", Der: " << c->getDer()
+             << ", Consumo: " << c->calcularConsumo() << endl;
+    }
+}
+
+void contarEquipos() {
+    int nc = 0, ne = 0, ni = 0;
+    for (auto eq : equipos) {
+        if (eq->getTipo() == "Centrifuga") nc++;
+        else if (eq->getTipo() == "Embolo") ne++;
+        else if (eq->getTipo() == "Intercambiador") ni++;
+    }
+    cout << "Centrifugas: " << nc << ", Embolos: " << ne << ", Intercambiadores: " << ni << endl;
+}
+
+void trabajadorMasAntiguo() {
+    if (empleados.empty()) {
+        cout << "No hay empleados." << endl;
+        return;
+    }
+    auto mayor = max_element(empleados.begin(), empleados.end(),
+        [](Empleado* a, Empleado* b) { return a->getAniosIndustria() < b->getAniosIndustria(); });
+    cout << "Trabajador mas antiguo: " << (*mayor)->getNombre()
+         << " con " << (*mayor)->getAniosIndustria() << " anos." << endl;
+}
+
+void guardarEquipos() {
+    ofstream archivo("equipos.txt");
+    if (archivo.is_open()) {
+        for (auto eq : equipos) {
+            archivo << eq->getTipo() << " ";
+            archivo << eq->getNumInv() << " " << eq->getCosto() << " ";
+
+            if (eq->getTipo() == "Centrifuga") {
+                Centrifuga* c = dynamic_cast<Centrifuga*>(eq);
+                archivo << c->getPs() << " " << c->getPd() << " " << c->getF() 
+                        << " " << c->getDer() << " " << c->getNp();
+            }
+            else if (eq->getTipo() == "Embolo") {
+                Embolo* e = dynamic_cast<Embolo*>(eq);
+                archivo << e->getPs() << " " << e->getPd() << " " << e->getF() 
+                        << " " << e->getL() << " " << e->getD();
+            }
+            else if (eq->getTipo() == "Intercambiador") {
+                Intercambiador* i = dynamic_cast<Intercambiador*>(eq);
+                archivo << i->getA() << " " << i->getPtc() << " " << i->getD();
+            }
+
+            archivo << endl;
+        }
+        archivo.close();
+        cout << "Equipos guardados correctamente." << endl;
+    } else {
+        cout << "Error al guardar los equipos." << endl;
+    }
+}
+
+
+void cargarEquipos() {
+    ifstream archivo("equipos.txt");
+    if (!archivo.is_open()) {
+        cout << "No se encontraron equipos guardados." << endl;
+        return;
+    }
+
+    // Limpiar vector
+    for (auto e : equipos) delete e;
+    equipos.clear();
+
+    string tipo;
+    while (archivo >> tipo) {
+        if (tipo == "Centrifuga") {
+            int ni, np;
+            float c, ps, pd, f, der;
+            archivo >> ni >> c >> ps >> pd >> f >> der >> np;
+            equipos.push_back(new Centrifuga(ni, c, ps, pd, f, der, np));
+        }
+        else if (tipo == "Embolo") {
+            int ni;
+            float c, ps, pd, f, l, d;
+            archivo >> ni >> c >> ps >> pd >> f >> l >> d;
+            equipos.push_back(new Embolo(ni, c, ps, pd, f, l, d));
+        }
+        else if (tipo == "Intercambiador") {
+            int ni;
+            float c, a, ptc, d;
+            archivo >> ni >> c >> a >> ptc >> d;
+            equipos.push_back(new Intercambiador(ni, c, a, ptc, d));
+        }
+    }
+
+    archivo.close();
+    cout << "Equipos cargados correctamente. (" << equipos.size() << " registros)" << endl;
+}
+
+
+
 int main() {
     cout << "=== PROGRAMA DE GESTION DE PERSONAL ===" << endl;
     
     // Cargar datos al iniciar
     cargarDatos();
+    cargarEquipos();
     
     int opcion;
     do {
@@ -276,7 +554,13 @@ int main() {
         cout << "2. Aniadir directores" << endl;
         cout << "3. Mostrar todos los empleados" << endl;
         cout << "4. Eliminar empleado" << endl;
-        cout << "5. Salir" << endl;
+        cout << "5. Aniadir equipo" << endl;
+        cout << "6. Mostrar consumo total" << endl;
+        cout << "7. Mostrar equipo mayor consumo" << endl;
+        cout << "8. Listar centrifugas ordenadas" << endl;
+        cout << "9. Contar equipos por tipo" << endl;
+        cout << "10. Trabajador mas antiguo" << endl;
+        cout << "0. Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
         
@@ -294,13 +578,35 @@ int main() {
                 eliminarEmpleado();
                 break;
             case 5:
+                aniadirEquipo();
+                break;
+            case 6: 
+                cout << "Consumo total: " << calcularConsumoTotal() << endl; 
+                break;
+            case 7: 
+                equipoMayorConsumo(); 
+                break;
+            case 8: 
+                listarCentrifugasOrdenadas(); 
+                break;
+            case 9: 
+                contarEquipos(); 
+                break;
+            case 10: 
+                trabajadorMasAntiguo(); 
+                break;
+            case 0:
                 cout << "Guardando datos y saliendo del programa..." << endl;
-                guardarDatos(); // Guardar antes de salir
+                guardarDatos();
+                guardarEquipos(); // Guardar antes de salir
                 break;
             default:
                 cout << "Opcion no valida" << endl;
         }
-    } while(opcion != 5); // mientras no sea la opción 5, muestra el menú
+    } while(opcion != 0); // mientras no sea la opción 5, muestra el menú
+
+    for (auto eq : equipos) delete eq;
+    equipos.clear();
 
     // Liberar memoria al salir
     for(Empleado* emp : empleados) {
