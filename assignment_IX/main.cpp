@@ -250,13 +250,14 @@ void aniadirEmpleado() {
     cout << "Cuantos empleados desea aniadir? ";
     int cantidadEmpleados;
     cin >> cantidadEmpleados;
+    cin.ignore(); 
     
     for (int i = 0; i < cantidadEmpleados; i++) {
         Empleado* nuevoEmpleado = new Empleado("", 0, 0);
         
-        cout << "Ingrese el nombre del empleado " << i + 1 << ": ";
+        cout << "Ingrese el nombre completo del empleado " << i + 1 << ": ";
         string nombre;
-        cin >> nombre;
+        getline(cin, nombre); // *** ERROR CORREGIDO 2: CAMBIADO de "cin >> nombre" a "getline(cin, nombre)"
         nuevoEmpleado->setNombre(nombre);
         
         cout << "Ingrese el ID del empleado " << i + 1 << ": ";
@@ -267,6 +268,7 @@ void aniadirEmpleado() {
         cout << "Ingrese los anios de industria del empleado " << i + 1 << ": ";
         int anios_industria;
         cin >> anios_industria;
+        cin.ignore(); 
         nuevoEmpleado->setAniosIndustria(anios_industria);
 
         empleados.push_back(nuevoEmpleado);
@@ -278,13 +280,15 @@ void aniadirDirector() {
     cout << "Cuantos directores desea aniadir? ";
     int cantidadDirectores;
     cin >> cantidadDirectores;
+    cin.ignore(); 
     
     for (int i = 0; i < cantidadDirectores; i++) {
         Director* nuevoDirector = new Director("", 0, 0, "", fecha());
         
-        cout << "Ingrese el nombre del director " << i + 1 << ": ";
+        cout << "Ingrese el nombre completo del director " << i + 1 << ": ";
         string nombre;
-        cin >> nombre;
+        getline(cin, nombre); // ERROR CORREGIDO CAMBIADO de "cin >> nombre" a "getline(cin, nombre)"
+                             // ANTES: cin >> nombre; (mismo problema que con empleados)
         nuevoDirector->setNombre(nombre);
         
         cout << "Ingrese el ID del director " << i + 1 << ": ";
@@ -305,6 +309,8 @@ void aniadirDirector() {
         cout << "Ingrese la fecha de inicio (dia mes anio) del director " << i + 1 << ": ";
         fecha fi;
         cin >> fi.dia >> fi.mes >> fi.anio;
+        cin.ignore(); // *** ERROR CORREGIDO 6: AGREGADO - Limpiar buffer después de leer fecha
+                      // *** ANTES: No existía, causaba problemas en iteraciones múltiples
         nuevoDirector->setFechaInicio(fi);
 
         empleados.push_back(nuevoDirector);
@@ -427,8 +433,8 @@ void equipoMayorConsumo() {
     auto mayor = max_element(equipos.begin(), equipos.end(),
         [](Equipo* a, Equipo* b) { return a->calcularConsumo() < b->calcularConsumo(); });
     cout << "Equipo de mayor consumo: #" << (*mayor)->getNumInv()
-         << " (" << (*mayor)->getTipo() << ") Consumo: "
-         << (*mayor)->calcularConsumo() << endl;
+        << " (" << (*mayor)->getTipo() << ") Consumo: "
+        << (*mayor)->calcularConsumo() << endl;
 }
 
 void listarCentrifugasOrdenadas() {
@@ -439,12 +445,12 @@ void listarCentrifugasOrdenadas() {
         }
     }
     sort(centrifugas.begin(), centrifugas.end(),
-         [](Centrifuga* a, Centrifuga* b) { return a->getDer() > b->getDer(); });
+        [](Centrifuga* a, Centrifuga* b) { return a->getDer() > b->getDer(); });
 
     cout << "Centrifugas ordenadas por diametro descendente:\n";
     for (auto c : centrifugas) {
         cout << "NumInv: " << c->getNumInv() << ", Der: " << c->getDer()
-             << ", Consumo: " << c->calcularConsumo() << endl;
+            << ", Consumo: " << c->calcularConsumo() << endl;
     }
 }
 
@@ -466,7 +472,7 @@ void trabajadorMasAntiguo() {
     auto mayor = max_element(empleados.begin(), empleados.end(),
         [](Empleado* a, Empleado* b) { return a->getAniosIndustria() < b->getAniosIndustria(); });
     cout << "Trabajador mas antiguo: " << (*mayor)->getNombre()
-         << " con " << (*mayor)->getAniosIndustria() << " anos." << endl;
+        << " con " << (*mayor)->getAniosIndustria() << " anos." << endl;
 }
 
 void guardarEquipos() {
