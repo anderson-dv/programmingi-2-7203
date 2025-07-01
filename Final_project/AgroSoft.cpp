@@ -472,7 +472,6 @@ int main() {
         cout << "2. Eliminar maquinaria" << endl;
         cout << "3. Mostrar maquinaria" << endl;
         cout << "4. Calcular costo total de máquinas operativas" << endl;
-        cout << "5. Costo de maquinarias activas" << endl;
         cout << "0. Salir" << endl;
         cout << "Seleccione una opción: ";
         cin >> opcion;
@@ -489,9 +488,6 @@ int main() {
                 break;
             case 4:
                 costoActivas();
-                break;
-            case 5:
-                costoActivas(); 
                 break;
             case 0:
                 cout << "Guardando datos y saliendo del programa..." << endl;
