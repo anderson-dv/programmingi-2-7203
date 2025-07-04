@@ -4,10 +4,15 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
+//! 6) Estructura del fichero de programa  
+
+//! 2) Tipos de datos:
 
 // Enumerations
 enum class MachineType { TRACTOR = 1, SEEDER, SPRAYER, HARVESTER };
 enum class MachineState { OPERATIONAL = 1, UNDER_REPAIR, OUT_OF_SERVICE };
+
+//! 1) Palabras reservadas:
 
 // Global messages errors and confirmations
 const string MSG_INVALID_OPTION = "Opcion Invalida. Intente nuevamente con un caracter tipo numero.";
@@ -15,8 +20,13 @@ const string MSG_INVALID_DATE = "Fecha invalida. Debe tener formato DD/MM/AAAA y
 const string MSG_REGISTER_OK = "Maquinaria registrada correctamente.";
 const string MSG_NO_MACHINERY = "No hay maquinarias registradas.";
 
+//! 11) Funciones:
+
 // Función para convertir MachineType a string
 string machineTypeToString(MachineType type) {
+
+    //! 9) condicionales (switch)
+
     switch(type) {
         case MachineType::TRACTOR: return "Tractor";
         case MachineType::SEEDER: return "Sembradora";
@@ -36,8 +46,13 @@ string machineStateToString(MachineState state) {
     }
 }
 
+//! 15) Clases:
+
 class Machinery {
 protected:
+
+    //! 3) Declaración de variables:
+
     int id;
     MachineType type;
     MachineState state;
@@ -49,7 +64,7 @@ public:
 
     virtual void show() const {
         cout << "Id: " << id << endl;
-        cout << "Tipo: " << machineTypeToString(type) << endl;
+        cout << "Tipo: " << machineTypeToString(type) << endl;  //! 12) Llamada de funciones 
         cout << "Fecha de adquisicion: " << acquisitionDate << endl;
         cout << "Estado: " << machineStateToString(state) << endl;
         cout << "Costo unitario: $" << cost << endl;
@@ -102,6 +117,7 @@ public:
 
 };
 
+//! 13) Uso de arreglos: estáticos y/o dinámicos 
 vector<Machinery*> inventory;
 
 // TODO: functions of validations
@@ -113,12 +129,17 @@ bool validateDate(const string& date) {
 
     int day, month, year;
     try {
+
+        //! 4) Funciones matemáticas incorporadas por el lenguaje  
+
         day = stoi(date.substr(0, 2));
         month = stoi(date.substr(3, 2));
         year = stoi(date.substr(6, 4));
     } catch (...) {
         return false;
     }
+
+    //! 5) Operadores en C++ 
 
     if (day < 1 || day > 31) return false;
     if (month < 1 || month > 12) return false;
@@ -220,10 +241,12 @@ int getValidatedOption(const string& prompt, int min, int max) {
 int main() {
     int option = -1;
 
+    //! 10) Estructuras repetitivas: do..while
+
     do {
         bool validOption = false;
         do {
-            cout << "\n----- Menu AgroSoft -----\n";
+            cout << "\n----- Menu AgroSoft -----\n";  //! 7) entrada/salida elemental
             cout << "1. Registrar nueva maquinaria\n";
             cout << "2. Mostrar el listado por tipo y estado\n";
             cout << "3. Costo total de maquinarias activas\n";
@@ -233,7 +256,7 @@ int main() {
             cout << "7. Tipo de combustible mas comun\n";
             cout << "0. Salir\n";
             cout << "Seleccione una opcion: ";
-
+            //! 8) Operadores de entrada/salida
             string line;
             getline(cin, line);
             try {
@@ -281,6 +304,8 @@ int main() {
                         case 2: fuel = "Gasolina"; break;
                         case 3: fuel = "Electrico"; break;
                     }
+                    //! 14) Uso de punteros  
+                    //! 16) Objetos        creando objetos de las clases TractorHarvester y SeederSprayer
                     inventory.push_back(
                         new TractorHarvester(id, type, state, acquisitionDate, cost, horsepower, maintenanceCount, fuel)
                     );
@@ -483,6 +508,7 @@ int main() {
             }
 
             case 0:
+                //! 17) Mensajes
                 cout << "Saliendo del programa...\n";
                 // liberar memoria
                 for (auto m : inventory) delete m;
@@ -496,4 +522,3 @@ int main() {
 
     return 0;
 }
-
