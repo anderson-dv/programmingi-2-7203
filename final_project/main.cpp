@@ -13,6 +13,7 @@ enum class MachineState { OPERATIONAL = 1, UNDER_REPAIR, OUT_OF_SERVICE };
 const string MSG_INVALID_OPTION = "Opcion Invalida. Intente nuevamente con un caracter tipo numero.";
 const string MSG_INVALID_DATE = "Fecha invalida. Debe tener formato DD/MM/AAAA y valores validos de tipo numero.";
 const string MSG_REGISTER_OK = "Maquinaria registrada correctamente.";
+const string MSG_NO_MACHINERY = "No hay maquinarias registradas.";
 
 // Función para convertir MachineType a string
 string machineTypeToString(MachineType type) {
@@ -299,7 +300,7 @@ int main() {
 
             case 2: {
                 if (inventory.empty()) {
-                    cout << "No hay maquinarias registradas.\n";
+                    cout << MSG_NO_MACHINERY << endl;
                     break;
                 }
 
@@ -341,7 +342,7 @@ int main() {
 
             case 3: {
                 if (inventory.empty()) {
-                    cout << "No hay maquinarias registradas.\n";
+                    cout << MSG_NO_MACHINERY << endl;
                     break;
                 }
 
@@ -359,7 +360,7 @@ int main() {
 
             case 4: {
                 if (inventory.empty()) {
-                    cout << "No hay maquinarias registradas.\n";
+                    cout << MSG_NO_MACHINERY << endl;
                     break;
                 }
 
@@ -388,7 +389,7 @@ int main() {
 
             case 5: {
                 if (inventory.empty()) {
-                    cout << "No hay maquinarias registradas.\n";
+                    cout << MSG_NO_MACHINERY << endl;
                     break;
                 }
 
@@ -416,7 +417,7 @@ int main() {
 
             case 6: {
                 if (inventory.empty()) {
-                    cout << "No hay maquinarias registradas.\n";
+                    cout << MSG_NO_MACHINERY << endl;
                     break;
                 }
 
@@ -442,7 +443,7 @@ int main() {
 
             case 7: {
                 if (inventory.empty()) {
-                    cout << "No hay maquinarias registradas.\n";
+                    cout << MSG_NO_MACHINERY << endl;
                     break;
                 }
 
