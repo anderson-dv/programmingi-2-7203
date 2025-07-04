@@ -226,6 +226,8 @@ int main() {
             cout << "3. Costo total de maquinarias activas\n";
             cout << "4. Maquinaria con mas mantenimientos\n";
             cout << "5. Maquinaria con mayor uso o consumo\n";
+            cout << "6. Costo promedio por tipo de maquinaria\n";
+            cout << "7. Tipo de combustible mas comun\n";
             cout << "0. Salir\n";
             cout << "Seleccione una opcion: ";
 
@@ -234,7 +236,7 @@ int main() {
             try {
                 size_t pos;
                 option = stoi(line, &pos);
-                if (pos != line.size() || option < 0 || option > 5) {
+                if (pos != line.size() || option < 0 || option > 7) {
                     throw invalid_argument("fuera de rango");
                 }
                 validOption = true;
@@ -409,6 +411,33 @@ int main() {
                 }
                 break;
             }
+
+            case 6: {
+                if (inventory.empty()) {
+                    cout << "No hay maquinarias registradas.\n";
+                    break;
+                }
+
+                cout << "\n--- Costo promedio por tipo de maquinaria ---\n";
+                for (int t = 1; t <= 4; t++) {
+                    MachineType mt = static_cast<MachineType>(t);
+                    double sum = 0.0;
+                    int count = 0;
+                    for (auto m : inventory) {
+                        if (m->getType() == mt) {
+                            sum += m->getCost();
+                            count++;
+                        }
+                    }
+                    if (count > 0) {
+                        cout << machineTypeToString(mt) << ": $" << (sum / count) << endl;
+                    } else {
+                        cout << machineTypeToString(mt) << ": Sin registros.\n";
+                    }
+                }
+                break;
+            }
+
 
             case 0:
                 cout << "Saliendo del programa...\n";
