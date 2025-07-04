@@ -254,7 +254,7 @@ int main() {
             cout << "5. Maquinaria con mayor uso o consumo\n";
             cout << "6. Costo promedio por tipo de maquinaria\n";
             cout << "7. Tipo de combustible mas comun\n";
-            cout << "0. Salir\n";
+            cout << "0. Salir\n\n";
             cout << "Seleccione una opcion: ";
             //! 8) Operadores de entrada/salida
             string line;
@@ -278,12 +278,12 @@ int main() {
 
                 int id = getValidatedInt("Ingrese ID para la maquinaria: ");
 
-                cout << "Seleccione tipo:\n";
+                cout << "Seleccione tipo:\n\n";
                 cout << "1. Tractor\n2. Sembradora\n3. Pulverizadora\n4. Cosechadora\n";
                 int typeOption = getValidatedOption("Opcion: ", 1, 4);
                 MachineType type = static_cast<MachineType>(typeOption);
 
-                cout << "Seleccione estado:\n";
+                cout << "Seleccione estado:\n\n";
                 cout << "1. Operativa\n2. En reparacion\n3. Fuera de servicio\n";
                 int stateOption = getValidatedOption("Opcion: ", 1, 3);
                 MachineState state = static_cast<MachineState>(stateOption);
@@ -295,7 +295,7 @@ int main() {
                     // tractor o cosechadora
                     int horsepower = getValidatedInt("Potencia en HP: ");
                     int maintenanceCount = getValidatedInt("Numero de mantenimientos realizados: ");
-                    cout << "Seleccione combustible:\n";
+                    cout << "Seleccione combustible:\n\n";
                     cout << "1. Diesel\n2. Gasolina\n3. Electrico\n";
                     int fuelOption = getValidatedOption("Opcion: ", 1, 3);
                     string fuel;
@@ -329,12 +329,12 @@ int main() {
                     break;
                 }
 
-                cout << "\nSeleccione el Tipo para filtrar:\n";
+                cout << "\nSeleccione el Tipo para filtrar:\n\n";
                 cout << "1. Tractor\n2. Sembradora\n3. Pulverizadora\n4. Cosechadora\n";
                 int typeFilter = getValidatedOption("Opcion: ", 1, 4);
                 MachineType filterType = static_cast<MachineType>(typeFilter);
 
-                cout << "Seleccione el Estado para filtrar:\n";
+                cout << "Seleccione el Estado para filtrar:\n\n";
                 cout << "1. Operativa\n2. En reparacion\n3. Fuera de servicio\n";
                 int stateFilter = getValidatedOption("Opcion: ", 1, 3);
                 MachineState filterState = static_cast<MachineState>(stateFilter);
@@ -378,7 +378,7 @@ int main() {
                     }
                 }
 
-                cout << "Costo total en maquinarias activas: $" << totalCost << endl;
+                cout << "\nCosto total en maquinarias activas: $" << totalCost << endl;
 
                 break;
             }
@@ -460,7 +460,7 @@ int main() {
                     if (count > 0) {
                         cout << machineTypeToString(mt) << ": $" << (sum / count) << endl;
                     } else {
-                        cout << machineTypeToString(mt) << ": Sin registros.\n";
+                        cout << machineTypeToString(mt) << ": Sin registros\n";
                     }
                 }
                 break;
@@ -502,7 +502,7 @@ int main() {
                     commonFuel = "Electrico";
                 }
 
-                cout << "Tipo de combustible mas comun: " << commonFuel << " (" << maxCount << " maquinas)" << endl;
+                cout << "\nTipo de combustible mas comun: " << commonFuel << " (" << maxCount << " maquinas)" << endl;
 
                 break;
             }
