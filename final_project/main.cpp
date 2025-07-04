@@ -79,6 +79,8 @@ public:
 
     int getMaintenanceCount() const { return maintenanceCount; }
 
+    string getFuel() const { return fuel; }
+
 };
 
 class SeederSprayer : public Machinery {
@@ -438,6 +440,46 @@ int main() {
                 break;
             }
 
+            case 7: {
+                if (inventory.empty()) {
+                    cout << "No hay maquinarias registradas.\n";
+                    break;
+                }
+
+                int dieselCount = 0, gasolinaCount = 0, electricoCount = 0;
+
+                for (auto m : inventory) {
+                    TractorHarvester* th = dynamic_cast<TractorHarvester*>(m);
+                    if (th != nullptr) {
+                        string f = th->getFuel();
+                        if (f == "Diesel") dieselCount++;
+                        else if (f == "Gasolina") gasolinaCount++;
+                        else if (f == "Electrico") electricoCount++;
+                    }
+                }
+
+                if (dieselCount == 0 && gasolinaCount == 0 && electricoCount == 0) {
+                    cout << "No hay tractores o cosechadoras registradas con combustible.\n";
+                    break;
+                }
+
+                string commonFuel;
+                int maxCount = dieselCount;
+                commonFuel = "Diesel";
+
+                if (gasolinaCount > maxCount) {
+                    maxCount = gasolinaCount;
+                    commonFuel = "Gasolina";
+                }
+                if (electricoCount > maxCount) {
+                    maxCount = electricoCount;
+                    commonFuel = "Electrico";
+                }
+
+                cout << "Tipo de combustible mas comun: " << commonFuel << " (" << maxCount << " maquinas)" << endl;
+
+                break;
+            }
 
             case 0:
                 cout << "Saliendo del programa...\n";
