@@ -22,6 +22,8 @@ struct Maquinaria {
     double costo;
 };
 
+vector<Maquinaria> inventario;
+
 // TODO: functions of validations
 
 // Validar fecha
@@ -160,7 +162,7 @@ int main() {
         do {
             cout << "\n----- Menu AgroSoft -----\n";
             cout << "1. Registrar nueva maquinaria\n";
-            cout << "2. Mostrar listado por estado y fecha\n";
+            cout << "2. Mostrar el listado por tipo y estado\n";
             cout << "0. Salir\n";
             cout << "Seleccione una opcion: ";
             cin >> option;
@@ -214,12 +216,12 @@ int main() {
                     break;
                 }
 
-                cout << "\nSeleccione tipo para filtrar:\n";
+                cout << "\nSeleccione Tipo para filtrar:\n";
                 cout << "1. Tractor\n2. Sembradora\n3. Pulverizadora\n4. Cosechadora\n";
                 int tipoFiltro = getValidatedOption("Opcion: ", 1, 4);
                 MachineType filtroTipo = static_cast<MachineType>(tipoFiltro);
 
-                cout << "Seleccione estado para filtrar:\n";
+                cout << "Seleccione Estado para filtrar:\n";
                 cout << "1. Operativa\n2. En reparacion\n3. Fuera de servicio\n";
                 int estadoFiltro = getValidatedOption("Opcion: ", 1, 3);
                 MachineState filtroEstado = static_cast<MachineState>(estadoFiltro);
@@ -242,12 +244,13 @@ int main() {
                     return fechaMenor(a.fechaAdquisicion, b.fechaAdquisicion);
                 });
 
-                cout << "\n--- Listado de maquinarias (Tipo: " << machineTypeToString(filtroTipo)
-                    << ", Estado: " << machineStateToString(filtroEstado) << ") ---\n";
+                cout << "\n--- Listado de maquinarias por tipo y estado ---\n";
                 for (const auto& m : filtrado) {
-                    cout << "ID: " << m.id
-                        << ", Fecha: " << m.fechaAdquisicion
-                        << ", Costo: $" << m.costo << "\n";
+                    cout << "Id: " << m.id << "\n";
+                    cout <<"Tipo: " << machineTypeToString(m.tipo) << "\n";
+                    cout <<"Fecha de Adquisicion: " << m.fechaAdquisicion << "\n";
+                    cout <<"Estado: " << machineStateToString(m.estado) << "\n";
+                    cout <<"Costo Unitario: $" << m.costo << "\n";
                 }
                 break;
             }
