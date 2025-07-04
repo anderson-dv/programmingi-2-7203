@@ -312,7 +312,7 @@ int main() {
                     break;
                 }
 
-                // Ordenar filtrado por  fecha
+                // Ordenar filtrado por fecha
                 sort(filtered.begin(), filtered.end(), [](Machinery* a, Machinery* b) {
                     return minorDate(a->getAcquisitionDate(), b->getAcquisitionDate());
                 });
