@@ -250,7 +250,6 @@ int main() {
                 int stateOption = getValidatedOption("Opcion: ", 1, 3);
                 MachineState state = static_cast<MachineState>(stateOption);
 
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
                 string acquisitionDate = getValidatedDate("Fecha de adquisicion (DD/MM/AAAA): ");
                 double cost = getValidatedDouble("Costo unitario: $");
 
