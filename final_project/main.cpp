@@ -55,6 +55,7 @@ public:
     }
 
     MachineType getType() const { return type; }
+    double getCost() const { return cost; }
     MachineState getState() const { return state; }
     string getAcquisitionDate() const { return acquisitionDate; }
 };
@@ -216,6 +217,7 @@ int main() {
             cout << "\n----- Menu AgroSoft -----\n";
             cout << "1. Registrar nueva maquinaria\n";
             cout << "2. Mostrar el listado por tipo y estado\n";
+            cout << "3. Costo total de maquinarias activas\n";
             cout << "0. Salir\n";
             cout << "Seleccione una opcion: ";
 
@@ -224,7 +226,7 @@ int main() {
             try {
                 size_t pos;
                 option = stoi(line, &pos);
-                if (pos != line.size() || option < 0 || option > 2) {
+                if (pos != line.size() || option < 0 || option > 3) {
                     throw invalid_argument("fuera de rango");
                 }
                 validOption = true;
@@ -324,6 +326,25 @@ int main() {
                 }
                 break;
             }
+
+            case 3: {
+                if (inventory.empty()) {
+                    cout << "No hay maquinarias registradas.\n";
+                    break;
+                }
+
+                double totalCost = 0.0;
+                for (auto m : inventory) {
+                    if (m->getState() == MachineState::OPERATIONAL) {
+                        totalCost += m->getCost();
+                    }
+                }
+
+                cout << "Costo total en maquinarias activas: $" << totalCost << endl;
+
+                break;
+            }
+
 
             case 0:
                 cout << "Saliendo del programa...\n";
