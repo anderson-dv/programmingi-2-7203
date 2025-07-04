@@ -14,15 +14,85 @@ const string MSG_INVALID_OPTION = "Opcion Invalida. Intente nuevamente con un ca
 const string MSG_INVALID_DATE = "Fecha invalida. Debe tener formato DD/MM/AAAA y valores validos de tipo numero.";
 const string MSG_REGISTER_OK = "Maquinaria registrada correctamente.";
 
-struct Maquinaria {
+// Función para convertir MachineType a string
+string machineTypeToString(MachineType type) {
+    switch(type) {
+        case MachineType::TRACTOR: return "Tractor";
+        case MachineType::SEEDER: return "Sembradora";
+        case MachineType::SPRAYER: return "Pulverizadora";
+        case MachineType::HARVESTER: return "Cosechadora";
+        default: return "Desconocido";
+    }
+}
+
+// Función para convertir MachineState a string
+string machineStateToString(MachineState state) {
+    switch(state) {
+        case MachineState::OPERATIONAL: return "Operativa";
+        case MachineState::UNDER_REPAIR: return "En reparacion";
+        case MachineState::OUT_OF_SERVICE: return "Fuera de servicio";
+        default: return "Desconocido";
+    }
+}
+
+class Machinery {
+protected:
     int id;
-    MachineType tipo;
-    MachineState estado;
-    string fechaAdquisicion;
-    double costo;
+    MachineType type;
+    MachineState state;
+    string acquisitionDate;
+    double cost;
+public:
+    Machinery(int id, MachineType type, MachineState state, const string& date, double cost)
+        : id(id), type(type), state(state), acquisitionDate(date), cost(cost) {}
+
+    virtual void show() const {
+        cout << "Id: " << id << endl;
+        cout << "Tipo: " << machineTypeToString(type) << endl;
+        cout << "Fecha de adquisicion: " << acquisitionDate << endl;
+        cout << "Estado: " << machineStateToString(state) << endl;
+        cout << "Costo unitario: $" << cost << endl;
+    }
+
+    MachineType getType() const { return type; }
+    MachineState getState() const { return state; }
+    string getAcquisitionDate() const { return acquisitionDate; }
 };
 
-vector<Maquinaria> inventario;
+class TractorHarvester : public Machinery {
+    int horsepower;
+    int maintenanceCount;
+    string fuel;
+public:
+    TractorHarvester(int id, MachineType type, MachineState state, const string& date, double cost,
+                     int horsepower, int maintenanceCount, const string& fuel)
+        : Machinery(id, type, state, date, cost),
+          horsepower(horsepower), maintenanceCount(maintenanceCount), fuel(fuel) {}
+
+    void show() const override {
+        Machinery::show();
+        cout << "Potencia: " << horsepower << " HP" << endl;
+        cout << "Mantenimientos realizados: " << maintenanceCount << endl;
+        cout << "Combustible: " << fuel << endl;
+    }
+};
+
+class SeederSprayer : public Machinery {
+    double capacity;
+    int usageCount;
+public:
+    SeederSprayer(int id, MachineType type, MachineState state, const string& date, double cost,
+                  double capacity, int usageCount)
+        : Machinery(id, type, state, date, cost), capacity(capacity), usageCount(usageCount) {}
+
+    void show() const override {
+        Machinery::show();
+        cout << "Capacidad: " << capacity << endl;
+        cout << "Usos: " << usageCount << endl;
+    }
+};
+
+vector<Machinery*> inventory;
 
 // TODO: functions of validations
 
@@ -47,29 +117,8 @@ bool validateDate(const string& date) {
     return true;
 }
 
-// Función para convertir MachineType a string
-string machineTypeToString(MachineType type) {
-    switch(type) {
-        case MachineType::TRACTOR: return "Tractor";
-        case MachineType::SEEDER: return "Sembradora";
-        case MachineType::SPRAYER: return "Pulverizadora";
-        case MachineType::HARVESTER: return "Cosechadora";
-        default: return "Desconocido";
-    }
-}
-
-// Función para convertir MachineState a string
-string machineStateToString(MachineState state) {
-    switch(state) {
-        case MachineState::OPERATIONAL: return "Operativa";
-        case MachineState::UNDER_REPAIR: return "En reparacion";
-        case MachineState::OUT_OF_SERVICE: return "Fuera de servicio";
-        default: return "Desconocido";
-    }
-}
-
 // Compara fechas en formato DD/MM/AAAA, devuelve true si a < b
-bool fechaMenor(const string& a, const string& b) {
+bool minorDate(const string& a, const string& b) {
     int dayA = stoi(a.substr(0, 2));
     int monthA = stoi(a.substr(3, 2));
     int yearA = stoi(a.substr(6, 4));
@@ -83,22 +132,24 @@ bool fechaMenor(const string& a, const string& b) {
     return dayA < dayB;
 }
 
-
 // Pide un int validado
 int getValidatedInt(const string& prompt) {
     int value;
+    string line;
     bool valid = false;
     do {
         cout << prompt;
-        cin >> value;
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << MSG_INVALID_OPTION << endl;
-        } else if (value < 0) {
-            cout << MSG_INVALID_OPTION << endl;
-        } else {
+        getline(cin, line);
+
+        try {
+            size_t pos;
+            value = stoi(line, &pos);
+            if (pos != line.size() || value < 0) {
+                throw invalid_argument("no entero");
+            }
             valid = true;
+        } catch (...) {
+            cout << MSG_INVALID_OPTION << endl;
         }
     } while (!valid);
     return value;
@@ -107,16 +158,21 @@ int getValidatedInt(const string& prompt) {
 // Pide un double validado
 double getValidatedDouble(const string& prompt) {
     double value;
+    string line;
     bool valid = false;
     do {
         cout << prompt;
-        cin >> value;
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(1000, '\n');
-            cout << MSG_INVALID_OPTION << endl;
-        } else {
+        getline(cin, line);
+
+        try {
+            size_t pos;
+            value = stod(line, &pos);
+            if (pos != line.size() || value < 0) {
+                throw invalid_argument("No es un numero válido");
+            }
             valid = true;
+        } catch (...) {
+            cout << MSG_INVALID_OPTION << endl;
         }
     } while (!valid);
     return value;
@@ -125,7 +181,6 @@ double getValidatedDouble(const string& prompt) {
 // Pide una fecha validada
 string getValidatedDate(const string& prompt) {
     string date;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // limpia buffer antes de pedir la fecha
     bool valid = false;
     do {
         cout << prompt;
@@ -152,8 +207,6 @@ int getValidatedOption(const string& prompt, int min, int max) {
     return value;
 }
 
-
-
 int main() {
     int option = -1;
 
@@ -165,16 +218,18 @@ int main() {
             cout << "2. Mostrar el listado por tipo y estado\n";
             cout << "0. Salir\n";
             cout << "Seleccione una opcion: ";
-            cin >> option;
 
-            if (cin.fail()) {
-                cin.clear();
-                cin.ignore(1000, '\n');
-                cout << MSG_INVALID_OPTION << endl;
-            } else if (option < 0 || option > 2) {
-                cout << MSG_INVALID_OPTION << endl;
-            } else {
+            string line;
+            getline(cin, line);
+            try {
+                size_t pos;
+                option = stoi(line, &pos);
+                if (pos != line.size() || option < 0 || option > 2) {
+                    throw invalid_argument("fuera de rango");
+                }
                 validOption = true;
+            } catch (...) {
+                cout << MSG_INVALID_OPTION << endl;
             }
 
         } while (!validOption);
@@ -188,22 +243,41 @@ int main() {
                 cout << "Seleccione tipo:\n";
                 cout << "1. Tractor\n2. Sembradora\n3. Pulverizadora\n4. Cosechadora\n";
                 int typeOption = getValidatedOption("Opcion: ", 1, 4);
+                MachineType type = static_cast<MachineType>(typeOption);
 
                 cout << "Seleccione estado:\n";
                 cout << "1. Operativa\n2. En reparacion\n3. Fuera de servicio\n";
                 int stateOption = getValidatedOption("Opcion: ", 1, 3);
+                MachineState state = static_cast<MachineState>(stateOption);
 
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
                 string acquisitionDate = getValidatedDate("Fecha de adquisicion (DD/MM/AAAA): ");
                 double cost = getValidatedDouble("Costo unitario: $");
 
-                Maquinaria m;
-                m.id = id;
-                m.tipo = static_cast<MachineType>(typeOption);
-                m.estado = static_cast<MachineState>(stateOption);
-                m.fechaAdquisicion = acquisitionDate;
-                m.costo = cost;
-
-                inventario.push_back(m);
+                if (type == MachineType::TRACTOR || type == MachineType::HARVESTER) {
+                    // tractor o cosechadora
+                    int horsepower = getValidatedInt("Potencia en HP: ");
+                    int maintenanceCount = getValidatedInt("Numero de mantenimientos realizados: ");
+                    cout << "Seleccione combustible:\n";
+                    cout << "1. Diesel\n2. Gasolina\n3. Electrico\n";
+                    int fuelOption = getValidatedOption("Opcion: ", 1, 3);
+                    string fuel;
+                    switch(fuelOption) {
+                        case 1: fuel = "Diesel"; break;
+                        case 2: fuel = "Gasolina"; break;
+                        case 3: fuel = "Electrico"; break;
+                    }
+                    inventory.push_back(
+                        new TractorHarvester(id, type, state, acquisitionDate, cost, horsepower, maintenanceCount, fuel)
+                    );
+                } else {
+                    // sembradora o pulverizadora
+                    double capacity = getValidatedDouble("Capacidad en litros o hectareas: ");
+                    int usageCount = getValidatedInt("Numero de veces utilizada: ");
+                    inventory.push_back(
+                        new SeederSprayer(id, type, state, acquisitionDate, cost, capacity, usageCount)
+                    );
+                }
 
                 cout << MSG_REGISTER_OK << endl;
 
@@ -211,52 +285,53 @@ int main() {
             }
 
             case 2: {
-                if (inventario.empty()) {
+                if (inventory.empty()) {
                     cout << "No hay maquinarias registradas.\n";
                     break;
                 }
 
-                cout << "\nSeleccione Tipo para filtrar:\n";
+                cout << "\nSeleccione el Tipo para filtrar:\n";
                 cout << "1. Tractor\n2. Sembradora\n3. Pulverizadora\n4. Cosechadora\n";
-                int tipoFiltro = getValidatedOption("Opcion: ", 1, 4);
-                MachineType filtroTipo = static_cast<MachineType>(tipoFiltro);
+                int typeFilter = getValidatedOption("Opcion: ", 1, 4);
+                MachineType filterType = static_cast<MachineType>(typeFilter);
 
-                cout << "Seleccione Estado para filtrar:\n";
+                cout << "Seleccione el Estado para filtrar:\n";
                 cout << "1. Operativa\n2. En reparacion\n3. Fuera de servicio\n";
-                int estadoFiltro = getValidatedOption("Opcion: ", 1, 3);
-                MachineState filtroEstado = static_cast<MachineState>(estadoFiltro);
+                int stateFilter = getValidatedOption("Opcion: ", 1, 3);
+                MachineState filterState = static_cast<MachineState>(stateFilter);
 
                 // Filtrar por tipo y estado
-                vector<Maquinaria> filtrado;
-                for (const auto& m : inventario) {
-                    if (m.tipo == filtroTipo && m.estado == filtroEstado) {
-                        filtrado.push_back(m);
+                vector<Machinery*> filtered;
+                for (auto m : inventory) {
+                    if (m->getType() == filterType && m->getState() == filterState) {
+                        filtered.push_back(m);
                     }
                 }
 
-                if (filtrado.empty()) {
+                if (filtered.empty()) {
                     cout << "No hay maquinarias que coincidan con el tipo y estado seleccionados.\n";
                     break;
                 }
 
                 // Ordenar filtrado por fecha
-                sort(filtrado.begin(), filtrado.end(), [](const Maquinaria& a, const Maquinaria& b) {
-                    return fechaMenor(a.fechaAdquisicion, b.fechaAdquisicion);
+                sort(filtered.begin(), filtered.end(), [](Machinery* a, Machinery* b) {
+                    return minorDate(a->getAcquisitionDate(), b->getAcquisitionDate());
                 });
 
                 cout << "\n--- Listado de maquinarias por tipo y estado ---\n";
-                for (const auto& m : filtrado) {
-                    cout << "Id: " << m.id << "\n";
-                    cout <<"Tipo: " << machineTypeToString(m.tipo) << "\n";
-                    cout <<"Fecha de Adquisicion: " << m.fechaAdquisicion << "\n";
-                    cout <<"Estado: " << machineStateToString(m.estado) << "\n";
-                    cout <<"Costo Unitario: $" << m.costo << "\n";
+                for (auto m : filtered) {
+                    m->show();
+                    cout << "--------------------------\n";
                 }
                 break;
             }
 
             case 0:
                 cout << "Saliendo del programa...\n";
+                // liberar memoria
+                for (auto m : inventory) delete m;
+
+                inventory.clear();
                 break;
             default:
                 cout << MSG_INVALID_OPTION << endl;
