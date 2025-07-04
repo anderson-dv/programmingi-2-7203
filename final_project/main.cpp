@@ -94,6 +94,9 @@ public:
         cout << "Capacidad: " << capacity << endl;
         cout << "Usos: " << usageCount << endl;
     }
+
+    int getUsageCount() const { return usageCount; }
+
 };
 
 vector<Machinery*> inventory;
@@ -375,6 +378,34 @@ int main() {
                     maxMaintenance->show();
                 } else {
                     cout << "No hay tractores o cosechadoras registradas.\n";
+                }
+                break;
+            }
+
+            case 5: {
+                if (inventory.empty()) {
+                    cout << "No hay maquinarias registradas.\n";
+                    break;
+                }
+
+                SeederSprayer* maxUsage = nullptr;
+                int maxUses = -1;
+
+                for (auto m : inventory) {
+                    SeederSprayer* ss = dynamic_cast<SeederSprayer*>(m);
+                    if (ss != nullptr) {
+                        if (ss->getUsageCount() > maxUses) {
+                            maxUses = ss->getUsageCount();
+                            maxUsage = ss;
+                        }
+                    }
+                }
+
+                if (maxUsage != nullptr) {
+                    cout << "\n--- Maquinaria con mayor uso o consumo ---\n";
+                    maxUsage->show();
+                } else {
+                    cout << "No hay sembradoras o pulverizadoras registradas.\n";
                 }
                 break;
             }
