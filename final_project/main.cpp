@@ -76,6 +76,9 @@ public:
         cout << "Mantenimientos realizados: " << maintenanceCount << endl;
         cout << "Combustible: " << fuel << endl;
     }
+
+    int getMaintenanceCount() const { return maintenanceCount; }
+
 };
 
 class SeederSprayer : public Machinery {
@@ -218,6 +221,8 @@ int main() {
             cout << "1. Registrar nueva maquinaria\n";
             cout << "2. Mostrar el listado por tipo y estado\n";
             cout << "3. Costo total de maquinarias activas\n";
+            cout << "4. Maquinaria con mas mantenimientos\n";
+            cout << "5. Maquinaria con mayor uso o consumo\n";
             cout << "0. Salir\n";
             cout << "Seleccione una opcion: ";
 
@@ -226,7 +231,7 @@ int main() {
             try {
                 size_t pos;
                 option = stoi(line, &pos);
-                if (pos != line.size() || option < 0 || option > 3) {
+                if (pos != line.size() || option < 0 || option > 5) {
                     throw invalid_argument("fuera de rango");
                 }
                 validOption = true;
@@ -345,6 +350,34 @@ int main() {
                 break;
             }
 
+            case 4: {
+                if (inventory.empty()) {
+                    cout << "No hay maquinarias registradas.\n";
+                    break;
+                }
+
+                TractorHarvester* maxMaintenance = nullptr;
+                int maxCount = -1;
+
+                for (auto m : inventory) {
+                    TractorHarvester* th = dynamic_cast<TractorHarvester*>(m);
+                    if (th != nullptr) {
+                        // downcast ok
+                        if (th->getMaintenanceCount() > maxCount) {
+                            maxCount = th->getMaintenanceCount();
+                            maxMaintenance = th;
+                        }
+                    }
+                }
+
+                if (maxMaintenance != nullptr) {
+                    cout << "\n--- Maquinaria con mas mantenimientos ---\n";
+                    maxMaintenance->show();
+                } else {
+                    cout << "No hay tractores o cosechadoras registradas.\n";
+                }
+                break;
+            }
 
             case 0:
                 cout << "Saliendo del programa...\n";
